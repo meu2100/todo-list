@@ -2,8 +2,19 @@ const express = require('express')
 const app = express()
 const port = 3000
 
+const db = require('./models')
+const Todo = db.Todo
+
+//...
+
 app.get('/', (req, res)=> {
   res.send('hello world')
+})
+
+app.get('/todos', (req, res) => {
+  return Todo.findAll()
+    .then((todos) => res.send({ todos }))
+    .catch((err) => res.status(422).json(err))
 })
 
 app.get('/todos', (req, res) => {
@@ -33,6 +44,8 @@ app.put('/todos/:id', (req, res) => {
 app.delete('/todos/:id', (req, res) => {
   res.send('delete todo')
 })
+
+
 
 
 app.listen(port, () => {
