@@ -2,6 +2,11 @@ const express = require('express')
 const flash = require('connect-flash')
 const session = require('express-session')
 const app = express()
+
+if (process.env.NODE_ENV === 'development') {
+	require('dotenv').config()
+}
+
 const port = 3000
 const router = require('./Routes')
 const messageHandler = require('./middlewares/message-handler')
@@ -21,9 +26,9 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 
 app.use(session({
-  secret: 'ThisIsSecret',
-  resave: false,
-  saveUninitialized: false
+	secret: process.env.SESSION_SECRET,
+	resave: false,
+	saveUninitialized: false
 }))
 
 app.use(flash())
