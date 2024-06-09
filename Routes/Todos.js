@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
       attributes: ['id', 'name', 'isComplete'],
       raw: true
     })
-      .then((todos) => res.render('todos', { todos, message: req.flash('success'), error: req.flash('error') }))
+      .then((todos) => res.render('todos', { todos, error: req.flash('error') }))
       .catch((error) => {
         console.error(error)
         req.flash('error', '資料取得失敗:(')
@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
 
 router.get('/new', (req, res) => {
   try{
-    return res.render('new', { error: req.flash('error') })
+    return res.render('new')
   }catch (error) {
     console.error(error)
     req.flash('error', '伺服器錯誤')
@@ -32,25 +32,18 @@ router.get('/new', (req, res) => {
   }
 })
 
-router.post('/', (req, res) => {
-  try {
-    const name = req.body.name
+router.post('/', (req, res, next) => {
+	const name = req.body.name
 
-    return Todo.create({ name })
-      .then(() => {
-        req.flash('success', '新增成功!')
-        return res.redirect('/todos')
-      })
-      .catch((error) => {
-        console.error(error)
-        req.flash('error', '新增失敗:(')
-        return res.redirect('back')
-      })
-  } catch (error) {
-    console.error(error)
-    req.flash('error', '新增失敗:(')
-    return res.redirect('back')
-  }
+	return Todo.create({ name })
+		.then(() => {
+			req.flash('success', '新增成功!')
+			return res.redirect('/todos')
+		})
+		.catch((error) => {
+			error.errorMessage = '新增失敗:('
+			next(error)
+		})
 })
 
 router.get('/:id', (req, res) => {
@@ -61,12 +54,11 @@ router.get('/:id', (req, res) => {
       attributes: ['id', 'name', 'isComplete'],
       raw: true
     })
-      .then((todo) => res.render('todo', { todos, message: req.flash('success') }))
-      .catch((err) => {
-        console.error(error)
-        req.flash('error', '資料取得失敗:(')
-        return res.redirect('back')
-      })
+      .then((todo) => res.render('todo', { todos }))
+      .catch((error) => {
+			error.errorMessage = '取得資料失敗:('
+			next(error)
+		})
   } catch (error) {
     console.error(error)
     req.flash('error', '伺服器錯誤')

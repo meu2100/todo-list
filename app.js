@@ -4,6 +4,8 @@ const session = require('express-session')
 const app = express()
 const port = 3000
 const router = require('./Routes')
+const messageHandler = require('./middlewares/message-handler')
+const errorHandler = require('./middlewares/error-handler')
 
 const { engine } = require('express-handlebars')
 const methodOverride = require('method-override')
@@ -23,8 +25,11 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }))
+
 app.use(flash())
+app.use(messageHandler)
 app.use(router)
+app.use(errorHandler)
 
 app.get('/', (req, res) => {
   res.render('index')
