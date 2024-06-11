@@ -9,10 +9,12 @@ router.get('/', (req, res, next) => {
 
 	return Todo.findAll({
 		attributes: ['id', 'name', 'isComplete'],
+		offset: (page - 1) * limit,
+		limit,
 		raw: true
 	})
 		.then((todos) => res.render('todos', { 
-			todos: todos.slice((page - 1) * limit, page * limit),
+			todos,
 			prev: page > 1 ? page - 1 : page,
 			next: page + 1,
 			page
@@ -21,7 +23,7 @@ router.get('/', (req, res, next) => {
 			error.errorMessage = '資料取得失敗:('
 			next(error)
 		})
-  })
+})
 
 router.get('/new', (req, res) => {
   return res.render('new')
