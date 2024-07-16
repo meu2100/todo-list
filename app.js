@@ -5,7 +5,7 @@ const app = express()
 const { engine } = require('express-handlebars')
 const methodOverride = require('method-override')
 
-const router = require('./routes')
+const router = require('./Routes')
 
 const messageHandler = require('./middlewares/message-handler')
 const errorHandler = require('./middlewares/error-handler')

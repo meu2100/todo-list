@@ -1,3 +1,5 @@
+{{> navbar}}
+{{> message}}
 <form action="/todos/{{todo.id}}?_method=PUT" method="POST">
   <input type="checkbox" name="isComplete" value="completed" {{#if todo.isComplete}} checked {{/if}}>
   <input type="text" placeholder="please input name" name="name" value="{{todo.name}}">
