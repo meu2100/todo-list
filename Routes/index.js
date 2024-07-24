@@ -33,7 +33,11 @@ passport.serializeUser((user, done) => {
   return done(null, { id, name, email });
 });
 
-router.use("/todos", todos);
+passport.deserializeUser((user, done) => {
+  done(null, { id: user.id });
+});
+
+router.use("/todos", authHandler, todos);
 router.use("/users", users);
 
 router.get("/", (req, res) => {
@@ -58,7 +62,13 @@ router.post(
 );
 
 router.post("/logout", (req, res) => {
-  return res.send("logout");
+  req.logout((error) => {
+    if (error) {
+      next(error);
+    }
+
+    return res.redirect("/login");
+  });
 });
 
 // 匯出路由器
