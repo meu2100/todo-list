@@ -1,14 +1,44 @@
-const express = require('express')
-const router = express.Router()
-const todos = require('./todos')
-const users = require('./users')
+const express = require("express");
+const router = express.Router();
+const todos = require("./todos");
+const users = require("./users");
+const passport = require("passport");
+const localStrategy = require("passport-local");
 
-router.use('/todos', todos)
-router.use('/users', users)
+const db = require("../models");
+const User = db.User;
 
-router.get('/', (req, res) => {
-	res.render('index')
-})
+passport.use(
+  new LocalStrategy({ usernameField: "email" }, (username, password, done) => {
+    return User.findOne({
+      attributes: ["id", "name", "email", "password"],
+      where: { email: username },
+      raw: true,
+    })
+      .then((user) => {
+        if (!user || user.password !== password) {
+          return done(null, false, { message: "email 或密碼錯誤" });
+        }
+        return done(null, user);
+      })
+      .catch((error) => {
+        error.errorMessage = "登入失敗";
+        done(error);
+      });
+  })
+);
+
+passport.serializeUser((user, done) => {
+  const { id, name, email } = user;
+  return done(null, { id, name, email });
+});
+
+router.use("/todos", todos);
+router.use("/users", users);
+
+router.get("/", (req, res) => {
+  res.render("index");
+});
 
 router.get("/register", (req, res) => {
   return res.render("register");
@@ -18,13 +48,18 @@ router.get("/login", (req, res) => {
   return res.render("login");
 });
 
-router.post("/login", (req, res) => {
-  return res.send(req.body);
-});
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: "/todos",
+    failureRedirect: "/login",
+    failureFlash: true,
+  })
+);
 
 router.post("/logout", (req, res) => {
   return res.send("logout");
 });
 
 // 匯出路由器
-module.exports = router
+module.exports = router;
