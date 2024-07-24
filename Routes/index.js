@@ -4,22 +4,30 @@ const todos = require("./todos");
 const users = require("./users");
 const passport = require("passport");
 const localStrategy = require("passport-local");
+const authHandler = require("../middlewares/auth-handler");
+const bcrypt = require('bcryptjs')
 
 const db = require("../models");
 const User = db.User;
 
 passport.use(
-  new LocalStrategy({ usernameField: "email" }, (username, password, done) => {
+  new localStrategy({ usernameField: "mail" }, (username, password, done) => {
     return User.findOne({
-      attributes: ["id", "name", "email", "password"],
-      where: { email: username },
+      attributes: ["id", "name", "mail", "password"],
+      where: { mail: username },
       raw: true,
     })
       .then((user) => {
-        if (!user || user.password !== password) {
-          return done(null, false, { message: "email 或密碼錯誤" });
+        if (!user) {
+          return done(null, false, { message: "mail 或密碼錯誤" });
         }
-        return done(null, user);
+        return bcrypt.compare(password, user.password).then((isMatch) => {
+          if (!isMatch) {
+            return done(null, false, { message: "mail 或密碼錯誤" });
+          }
+
+          return done(null, user);
+        });
       })
       .catch((error) => {
         error.errorMessage = "登入失敗";
@@ -29,8 +37,8 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  const { id, name, email } = user;
-  return done(null, { id, name, email });
+  const { id, name, mail } = user;
+  return done(null, { id, name, mail });
 });
 
 passport.deserializeUser((user, done) => {
