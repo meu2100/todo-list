@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require("express");
 const flash = require("connect-flash");
 const session = require("express-session");
@@ -12,6 +13,8 @@ const messageHandler = require("./middlewares/message-handler");
 const errorHandler = require("./middlewares/error-handler");
 
 const port = 3000;
+
+// console.log(process.env)
 
 app.engine(".hbs", engine({ extname: ".hbs" }));
 app.set("view engine", ".hbs");

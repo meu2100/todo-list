@@ -3,9 +3,9 @@
 <form action="/login" method="POST">
     <div>
         <div>
-            <label for="mail">Email</label>
+            <label for="email">Email</label>
         </div>
-        <input type="mail" name="mail" placeholder="Enter mail" required>
+        <input type="email" name="email" placeholder="Enter email" required>
     </div>
     <div>
         <div>
@@ -15,10 +15,10 @@
     </div>
     <button type="submit">Login</button>
 </form>
+<form action="/oauth2/login/facebook" method="GET">
+    <button type="submit">Facebook Login</button>
+</form>
 <div>
     <span>No account?</span>
     <a href="/register">Register</a>
 </div>
-<form action="/login/facebook" method="GET">
-    <button type="submit">Facebook Login</button>
-</form>
